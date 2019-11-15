@@ -68,10 +68,7 @@ def RCE_UT_loss(y_true, y_pred, weights):
 
     return loss
 
-def train(model,epochs,n_pick,t_pick):
-    #specify WSI patches path here
-    n_path = "" #normal
-    t_path = "" #tumor
+def train(model,epochs,n_pick,t_pick,n_path,t_path):
     
     miu = 0.2
     ad = Adam(0.00001)
@@ -110,6 +107,7 @@ def train(model,epochs,n_pick,t_pick):
             
     s = []
     for e in range(1,epochs+1):
+        print('epoch:',e)
         aug = ImageDataGenerator()
         loss = 0
         acc = 0
@@ -149,7 +147,7 @@ def train(model,epochs,n_pick,t_pick):
             else:
                 w.append(0)
         w = np.array(w)
-        print(e,'done')
+        
         
     print('training finished')
     
@@ -199,7 +197,16 @@ def test(model):
 if __name__ == '__main__':
     model = ResNet.ResNet50()
     
-    #specify fater directory of the patches
+    #specify main directory of the patches
+    # - n_path:
+    #       - WSI1
+    #           - 1_patches
+    #               - 1_1.png
+    #               - ...
+    #       - WSI2
+    #           - ...
+    #       - ...
+    
     n_path = "" #normal
     t_path = "" #tumor
     nwsi = os.listdir(n_path)
@@ -209,10 +216,10 @@ if __name__ == '__main__':
 
     #train phase
     for i in range(100):
-        print(i,"***"+str(nwsi[i]),str(twsi[i]+"***"))
+        print("Pair: "i,"***"+str(nwsi[i]),str(twsi[i]+" start ***"))
         
         #memory limit, pass only one WSI for each class
-        model = train(model,5,[nwsi[i]],[twsi[i]])
+        model = train(model,5,[nwsi[i]],[twsi[i]],n_path,t_path)
     
     #test phase
     test(model)
